@@ -1,0 +1,831 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Execution capabilities in technical program management: CapEx, NPI, Supply Chain, CM/OEM, and program governance.">
+    <title>Execution Capabilities — Sourabh Tarodekar | Technical Program Management</title>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --bg-primary: #0c0e12;
+            --bg-secondary: #15181e;
+            --bg-tertiary: #1a1d24;
+            --text-primary: #f0f0f0;
+            --text-secondary: #9ca3af;
+            --text-tertiary: #6b7280;
+            --accent: #b8954f;
+            --accent-subtle: rgba(184, 149, 79, 0.08);
+            --border: rgba(255, 255, 255, 0.06);
+            --border-strong: rgba(255, 255, 255, 0.1);
+            --circuit: rgba(184, 149, 79, 0.03);
+        }
+
+        body.light-mode {
+            --bg-primary: #fafafa;
+            --bg-secondary: #ffffff;
+            --bg-tertiary: #f3f4f6;
+            --text-primary: #111827;
+            --text-secondary: #4b5563;
+            --text-tertiary: #6b7280;
+            --accent: #1e3a5f;
+            --accent-subtle: rgba(30, 58, 95, 0.06);
+            --border: rgba(0, 0, 0, 0.08);
+            --border-strong: rgba(0, 0, 0, 0.1);
+            --circuit: rgba(30, 58, 95, 0.03);
+        }
+
+        html {
+            font-size: 16px;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background-color: var(--bg-primary);
+            color: var(--text-primary);
+            line-height: 1.6;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Background */
+        #circuit-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+            opacity: 0.4;
+            pointer-events: none;
+        }
+
+        /* Header */
+        header {
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            padding: 1.5rem 6rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            max-width: 1400px;
+            margin: 0 auto;
+            width: 100%;
+            background: rgba(12, 14, 18, 0.8);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--border);
+            transition: all 0.3s ease;
+        }
+
+        body.light-mode header {
+            background: rgba(250, 250, 250, 0.8);
+        }
+
+        .brand {
+            display: flex;
+            flex-direction: column;
+            gap: 0.25rem;
+        }
+
+        .brand-name {
+            font-size: 0.875rem;
+            font-weight: 600;
+            letter-spacing: 0.15em;
+            text-transform: uppercase;
+            color: var(--text-primary);
+        }
+
+        .brand-name a {
+            color: inherit;
+            text-decoration: none;
+            transition: opacity 0.2s;
+        }
+
+        .brand-name a:hover {
+            opacity: 0.7;
+        }
+
+        .brand-role {
+            font-size: 0.7rem;
+            color: var(--text-secondary);
+            letter-spacing: 0.05em;
+            font-weight: 500;
+        }
+
+        nav {
+            display: flex;
+            gap: 2.5rem;
+            align-items: center;
+        }
+
+        nav a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-size: 0.875rem;
+            font-weight: 500;
+            letter-spacing: 0.02em;
+            transition: all 0.2s ease;
+            position: relative;
+            padding: 0.5rem 0;
+        }
+
+        nav a:hover {
+            color: var(--text-primary);
+        }
+
+        nav a.active {
+            color: var(--accent);
+        }
+
+        nav a::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 0;
+            height: 1px;
+            background-color: var(--accent);
+            transition: width 0.3s ease;
+        }
+
+        nav a:hover::after,
+        nav a.active::after {
+            width: 100%;
+        }
+
+        .theme-toggle {
+            background: none;
+            border: none;
+            color: var(--text-secondary);
+            cursor: pointer;
+            padding: 0.5rem;
+            margin-left: 1.5rem;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+        }
+
+        .theme-toggle:hover {
+            color: var(--accent);
+            background: var(--accent-subtle);
+        }
+
+        /* Hero Section */
+        .hero {
+            position: relative;
+            z-index: 10;
+            padding: 6rem 6rem 3rem;
+            max-width: 1200px;
+            margin: 0 auto;
+            width: 100%;
+            text-align: center;
+        }
+
+        .eyebrow {
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.2em;
+            color: var(--accent);
+            margin-bottom: 1.5rem;
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .eyebrow::before,
+        .eyebrow::after {
+            content: '';
+            display: inline-block;
+            width: 24px;
+            height: 1px;
+            background-color: var(--accent);
+        }
+
+        h1 {
+            font-size: clamp(2.5rem, 5vw, 4rem);
+            font-weight: 300;
+            line-height: 1.1;
+            margin-bottom: 1.5rem;
+            letter-spacing: -0.02em;
+        }
+
+        h1 strong {
+            font-weight: 600;
+        }
+
+        .subtitle {
+            font-size: 1.25rem;
+            color: var(--text-secondary);
+            font-weight: 400;
+            margin-bottom: 1.5rem;
+        }
+
+        .intro {
+            font-size: 1rem;
+            color: var(--text-tertiary);
+            max-width: 600px;
+            margin: 0 auto;
+            line-height: 1.6;
+        }
+
+        /* Main Container */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem 6rem 6rem;
+            position: relative;
+            z-index: 10;
+            flex: 1;
+            width: 100%;
+        }
+
+        /* Capability Grid */
+        .capability-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 1.5rem;
+            margin-bottom: 4rem;
+        }
+
+        .capability-card {
+            position: relative;
+            padding: 2.5rem 2rem;
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            text-decoration: none;
+            color: inherit;
+            transition: all 0.3s ease;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            min-height: 280px;
+            cursor: pointer;
+            overflow: hidden;
+        }
+
+        .capability-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background: var(--accent);
+            transform: scaleX(0);
+            transition: transform 0.3s ease;
+        }
+
+        .capability-card:hover {
+            border-color: var(--accent);
+            transform: translateY(-4px);
+            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.2);
+        }
+
+        .capability-card:hover::before {
+            transform: scaleX(1);
+        }
+
+        body.light-mode .capability-card:hover {
+            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.08);
+        }
+
+        .card-icon {
+            width: 48px;
+            height: 48px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: var(--accent-subtle);
+            border-radius: 12px;
+            margin-bottom: 1.5rem;
+            color: var(--accent);
+            transition: all 0.3s ease;
+        }
+
+        .capability-card:hover .card-icon {
+            background: var(--accent);
+            color: var(--bg-primary);
+            transform: scale(1.1);
+        }
+
+        body.light-mode .capability-card:hover .card-icon {
+            color: #ffffff;
+        }
+
+        .card-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .card-title {
+            font-size: 1.125rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 0.75rem;
+            line-height: 1.3;
+            letter-spacing: -0.01em;
+        }
+
+        .card-description {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            line-height: 1.6;
+            margin-bottom: 1.5rem;
+            flex: 1;
+        }
+
+        .card-link {
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: var(--accent);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: gap 0.2s ease;
+        }
+
+        .capability-card:hover .card-link {
+            gap: 0.75rem;
+        }
+
+        /* Info Section */
+        .info-section {
+            max-width: 800px;
+            margin: 4rem auto 0;
+            padding: 3rem;
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            text-align: center;
+        }
+
+        .info-section h2 {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 1rem;
+            letter-spacing: -0.01em;
+        }
+
+        .info-section p {
+            font-size: 1rem;
+            color: var(--text-secondary);
+            line-height: 1.7;
+            margin: 0;
+        }
+
+        .info-section strong {
+            color: var(--text-primary);
+            font-weight: 600;
+        }
+
+        /* Footer Nav */
+        .footer-nav {
+            margin-top: 6rem;
+            padding-top: 3rem;
+            border-top: 1px solid var(--border);
+            display: flex;
+            justify-content: center;
+            gap: 4rem;
+        }
+
+        .footer-link {
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-size: 0.875rem;
+            font-weight: 500;
+            letter-spacing: 0.02em;
+            transition: color 0.2s ease;
+            position: relative;
+            padding: 0.5rem 0;
+        }
+
+        .footer-link:hover {
+            color: var(--accent);
+        }
+
+        .footer-link::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 0;
+            height: 1px;
+            background: var(--accent);
+            transition: width 0.3s ease;
+        }
+
+        .footer-link:hover::after {
+            width: 100%;
+        }
+
+        /* Global Footer */
+        footer {
+            position: relative;
+            z-index: 10;
+            padding: 3rem 6rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            max-width: 1400px;
+            margin: 0 auto;
+            width: 100%;
+            border-top: 1px solid var(--border);
+            background: var(--bg-primary);
+        }
+
+        .footer-left {
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+            letter-spacing: 0.02em;
+        }
+
+        .footer-right {
+            display: flex;
+            gap: 2rem;
+        }
+
+        .social-link {
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-size: 0.875rem;
+            transition: color 0.2s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .social-link:hover {
+            color: var(--accent);
+        }
+
+        /* Responsive */
+        @media (max-width: 1200px) {
+            header, .hero, .container, footer {
+                padding-left: 3rem;
+                padding-right: 3rem;
+            }
+
+            .capability-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 768px) {
+            header {
+                flex-direction: column;
+                gap: 1rem;
+                padding: 1rem 2rem;
+            }
+
+            nav {
+                width: 100%;
+                justify-content: center;
+                gap: 1.5rem;
+                flex-wrap: wrap;
+            }
+
+            .theme-toggle {
+                margin-left: 0;
+                position: absolute;
+                right: 2rem;
+                top: 1.5rem;
+            }
+
+            .hero {
+                padding: 4rem 2rem 2rem;
+            }
+
+            h1 {
+                font-size: 2rem;
+            }
+
+            .subtitle {
+                font-size: 1.1rem;
+            }
+
+            .container {
+                padding: 2rem;
+            }
+
+            .capability-grid {
+                grid-template-columns: 1fr;
+                gap: 1rem;
+            }
+
+            .capability-card {
+                min-height: auto;
+                padding: 2rem;
+            }
+
+            .info-section {
+                padding: 2rem;
+                margin-top: 3rem;
+            }
+
+            .footer-nav {
+                flex-direction: column;
+                gap: 1.5rem;
+                align-items: center;
+            }
+
+            footer {
+                flex-direction: column;
+                gap: 1.5rem;
+                text-align: center;
+                padding: 2rem;
+            }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            * {
+                animation: none !important;
+                transition: none !important;
+            }
+        }
+    </style>
+</head>
+<body>
+    <canvas id="circuit-canvas"></canvas>
+
+    <header>
+        <div class="brand">
+            <div class="brand-name"><a href="/index.html">Sourabh Tarodekar</a></div>
+            <div class="brand-role">Technical Program Management — Hardware & Operations</div>
+        </div>
+        
+        <nav>
+            <a href="/about.html">About</a>
+            <a href="/capabilities.html" class="active">Capabilities</a>
+            <a href="/experience.html">Experience</a>
+            <a href="/contact.html">Contact</a>
+            <button class="theme-toggle" id="theme-toggle" aria-label="Toggle theme">
+                <i data-lucide="moon" size="18" id="theme-icon"></i>
+            </button>
+        </nav>
+    </header>
+
+    <section class="hero">
+        <div class="eyebrow">Portfolio</div>
+        <h1>Execution <strong>Capabilities</strong></h1>
+        <p class="subtitle">How I drive complex hardware programs from development through scale</p>
+        <p class="intro">This portfolio is organized by execution capability rather than job title. Select the area most relevant to your role to view detailed examples, artifacts, and outcomes.</p>
+    </section>
+
+    <main class="container">
+        <div class="capability-grid">
+            <!-- Card 1 -->
+            <a href="/capabilities/product-technology.html" class="capability-card">
+                <div class="card-icon">
+                    <i data-lucide="cpu" size="24"></i>
+                </div>
+                <div class="card-content">
+                    <h3 class="card-title">Product Development & Technology Execution</h3>
+                    <p class="card-description">Translating system intent into executable plans by managing technical dependencies, interfaces, and development risk across complex hardware programs.</p>
+                    <div class="card-link">View details <i data-lucide="arrow-right" size="14"></i></div>
+                </div>
+            </a>
+
+            <!-- Card 2 -->
+            <a href="/capabilities/build-readiness.html" class="capability-card">
+                <div class="card-icon">
+                    <i data-lucide="check-circle" size="24"></i>
+                </div>
+                <div class="card-content">
+                    <h3 class="card-title">NPI & Engineering Build Readiness</h3>
+                    <p class="card-description">Owning clear-to-build execution across Proto, EVT, DVT, and PVT phases, ensuring material, supplier, and factory readiness before builds enter the line.</p>
+                    <div class="card-link">View details <i data-lucide="arrow-right" size="14"></i></div>
+                </div>
+            </a>
+
+            <!-- Card 3 -->
+            <a href="/capabilities/capex.html" class="capability-card">
+                <div class="card-icon">
+                    <i data-lucide="trending-up" size="24"></i>
+                </div>
+                <div class="card-content">
+                    <h3 class="card-title">Capital Expenditure Strategy & Governance</h3>
+                    <p class="card-description">Driving capital allocation decisions through cost, capacity, timing, and risk trade-offs across development and production environments.</p>
+                    <div class="card-link">View details <i data-lucide="arrow-right" size="14"></i></div>
+                </div>
+            </a>
+
+            <!-- Card 4 -->
+            <a href="/capabilities/supply-chain.html" class="capability-card">
+                <div class="card-icon">
+                    <i data-lucide="truck" size="24"></i>
+                </div>
+                <div class="card-content">
+                    <h3 class="card-title">Supply Chain & Material Execution</h3>
+                    <p class="card-description">Ensuring material readiness through early long-lead risk identification, logistics planning, and structured recovery execution across global supply chains.</p>
+                    <div class="card-link">View details <i data-lucide="arrow-right" size="14"></i></div>
+                </div>
+            </a>
+
+            <!-- Card 5 -->
+            <a href="/capabilities/cm-oem.html" class="capability-card">
+                <div class="card-icon">
+                    <i data-lucide="factory" size="24"></i>
+                </div>
+                <div class="card-content">
+                    <h3 class="card-title">CM & OEM Execution Management</h3>
+                    <p class="card-description">Leading execution across contract manufacturers and OEM partners to align capacity, readiness, and delivery across development and production phases.</p>
+                    <div class="card-link">View details <i data-lucide="arrow-right" size="14"></i></div>
+                </div>
+            </a>
+
+            <!-- Card 6 -->
+            <a href="/capabilities/suppliers.html" class="capability-card">
+                <div class="card-icon">
+                    <i data-lucide="handshake" size="24"></i>
+                </div>
+                <div class="card-content">
+                    <h3 class="card-title">Supplier & Partner Execution</h3>
+                    <p class="card-description">Managing execution across tier-1 suppliers through readiness tracking, capacity alignment, and performance-driven accountability.</p>
+                    <div class="card-link">View details <i data-lucide="arrow-right" size="14"></i></div>
+                </div>
+            </a>
+
+            <!-- Card 7 -->
+            <a href="/capabilities/governance.html" class="capability-card">
+                <div class="card-icon">
+                    <i data-lucide="layout" size="24"></i>
+                </div>
+                <div class="card-content">
+                    <h3 class="card-title">Program Leadership & Governance</h3>
+                    <p class="card-description">Establishing operating cadence, decision frameworks, and executive visibility to enable predictable execution under changing constraints.</p>
+                    <div class="card-link">View details <i data-lucide="arrow-right" size="14"></i></div>
+                </div>
+            </a>
+
+            <!-- Card 8 -->
+            <a href="/capabilities/decision-making.html" class="capability-card">
+                <div class="card-icon">
+                    <i data-lucide="git-compare" size="24"></i>
+                </div>
+                <div class="card-content">
+                    <h3 class="card-title">Cross-Functional Decision Making</h3>
+                    <p class="card-description">Framing trade-offs across engineering, operations, finance, and supply chain to enable timely, data-driven decisions at scale.</p>
+                    <div class="card-link">View details <i data-lucide="arrow-right" size="14"></i></div>
+                </div>
+            </a>
+        </div>
+
+        <div class="info-section">
+            <h2>How to Use These Pages</h2>
+            <p>Each capability page includes what I own, how I execute, and concrete artifacts with business impact. <strong>These pages complement, not replace, role-specific resumes.</strong> They are designed for hiring managers evaluating execution depth.</p>
+        </div>
+
+        <div class="footer-nav">
+            <a href="/about.html" class="footer-link">About</a>
+            <a href="/experience.html" class="footer-link">Experience</a>
+            <a href="/contact.html" class="footer-link">Contact</a>
+        </div>
+    </main>
+
+    <footer>
+        <div class="footer-left">San Francisco Bay Area · Hardware · Manufacturing · Operations</div>
+        <div class="footer-right">
+            <a href="#" class="social-link">LinkedIn</a>
+            <a href="#" class="social-link">Email</a>
+        </div>
+    </footer>
+
+    <script>
+        lucide.createIcons();
+
+        // Theme Toggle
+        const themeBtn = document.getElementById('theme-toggle');
+        const themeIcon = document.getElementById('theme-icon');
+        
+        const savedTheme = localStorage.getItem('theme');
+        if (savedTheme === 'light') {
+            document.body.classList.add('light-mode');
+            themeIcon.setAttribute('data-lucide', 'sun');
+            lucide.createIcons();
+        }
+
+        themeBtn.addEventListener('click', () => {
+            document.body.classList.toggle('light-mode');
+            const isLight = document.body.classList.contains('light-mode');
+            localStorage.setItem('theme', isLight ? 'light' : 'dark');
+            themeIcon.setAttribute('data-lucide', isLight ? 'sun' : 'moon');
+            lucide.createIcons();
+        });
+
+        // Circuit Background
+        const canvas = document.getElementById('circuit-canvas');
+        const ctx = canvas.getContext('2d');
+        let width, height;
+        let circuits = [];
+        const GRID_SIZE = 100;
+        const LINE_COUNT = 8;
+
+        class CircuitLine {
+            constructor() {
+                this.reset();
+            }
+
+            reset() {
+                this.x = Math.round((Math.random() * window.innerWidth) / GRID_SIZE) * GRID_SIZE;
+                this.y = Math.round((Math.random() * window.innerHeight) / GRID_SIZE) * GRID_SIZE;
+                this.direction = Math.floor(Math.random() * 4);
+                this.speed = 0.1;
+                this.opacity = 0;
+                this.targetOpacity = Math.random() * 0.08 + 0.02;
+                this.path = [{x: this.x, y: this.y}];
+                this.segmentLength = 0;
+                this.maxSegment = Math.random() * 3 + 2;
+            }
+
+            update() {
+                if (this.opacity < this.targetOpacity) {
+                    this.opacity += 0.002;
+                }
+
+                switch(this.direction) {
+                    case 0: this.y -= this.speed; break;
+                    case 1: this.x += this.speed; break;
+                    case 2: this.y += this.speed; break;
+                    case 3: this.x -= this.speed; break;
+                }
+
+                this.segmentLength += this.speed / GRID_SIZE;
+
+                if (this.segmentLength >= this.maxSegment) {
+                    if (Math.random() > 0.5) {
+                        const turn = Math.random() > 0.5 ? 1 : -1;
+                        this.direction = (this.direction + turn + 4) % 4;
+                    }
+                    this.segmentLength = 0;
+                    this.maxSegment = Math.random() * 3 + 2;
+                    this.path.push({x: this.x, y: this.y});
+                    if (this.path.length > 4) this.path.shift();
+                }
+
+                if (this.x < -100 || this.x > width + 100 || 
+                    this.y < -100 || this.y > height + 100) {
+                    this.reset();
+                }
+            }
+
+            draw() {
+                const accentColor = getComputedStyle(document.body).getPropertyValue('--accent').trim();
+                
+                ctx.beginPath();
+                ctx.strokeStyle = accentColor;
+                ctx.globalAlpha = this.opacity;
+                ctx.lineWidth = 0.5;
+                ctx.lineCap = 'round';
+                ctx.lineJoin = 'round';
+
+                if (this.path.length > 0) {
+                    ctx.moveTo(this.path[0].x, this.path[0].y);
+                    for (let point of this.path) {
+                        ctx.lineTo(point.x, point.y);
+                    }
+                    ctx.lineTo(this.x, this.y);
+                }
+                ctx.stroke();
+
+                ctx.globalAlpha = 1;
+            }
+        }
+
+        function initCircuit() {
+            width = canvas.width = window.innerWidth;
+            height = canvas.height = window.innerHeight;
+            circuits = Array.from({length: LINE_COUNT}, () => new CircuitLine());
+        }
+
+        function animateCircuit() {
+            ctx.clearRect(0, 0, width, height);
+            circuits.forEach(circuit => {
+                circuit.update();
+                circuit.draw();
+            });
+            requestAnimationFrame(animateCircuit);
+        }
+
+        window.addEventListener('resize', initCircuit);
+        initCircuit();
+        animateCircuit();
+    </script>
+</body>
+</html>
